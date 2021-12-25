@@ -5,14 +5,15 @@ import {Calendar, DayValue, utils} from "react-modern-calendar-datepicker";
 import {myCustomLocale} from "./calendarCastomize";
 
 type PropsType = {
-    addArrivalDate: (day: number | null | undefined, month: number | null | undefined, year: number | null | undefined) => void
+    addArrivalDate: (day: string | null ) => void
 }
 
-const MainCalendar:FC<PropsType> = (props) => {
+const ArrivalCalendar:FC<PropsType> = (props) => {
     const defaultValue = utils('en').getToday();
     const [day, setDay] = useState<DayValue>(defaultValue);
+    const convert = `${day!.year}-${day!.month}-${day!.day}`
     useEffect(()=>{
-        props.addArrivalDate(day!.day, day!.month, day!.year)
+        props.addArrivalDate(convert)
     },[day])
 
 
@@ -28,4 +29,4 @@ const MainCalendar:FC<PropsType> = (props) => {
 
 }
 
-export default MainCalendar;
+export default ArrivalCalendar;
