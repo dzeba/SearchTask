@@ -8,7 +8,7 @@ export const searchAPI = {
         if(departure_date !== null) query.departure_date = departure_date
         if(arrival_date !== null) query.arrival_date = arrival_date
         if(adults !== 0) query.adults = adults
-        if(kids.length > 0) query.kids = kids
+        if(kids) query.kids = kids
         let myUrl = `https://api.dev24.bukovel.net/b24/desktop/hotels?${queryString.stringify(query,{arrayFormat: 'bracket'})}`
         return axios.get(myUrl)
     }

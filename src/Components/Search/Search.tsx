@@ -1,4 +1,4 @@
-import React, {FC, Suspense, useCallback, useEffect, useLayoutEffect, useRef, useState} from "react";
+import React, {FC, useEffect, useLayoutEffect, useRef, useState} from "react";
 import '../../App.css';
 import NumbersOfPeople from "./NumbersOfPeople";
 import ArrivalCalendar from "./ArrivalCalendar";
@@ -145,6 +145,7 @@ const Search: FC<PropsType> = (props) => {
         }
     }
     let SendRequestClick = () => {
+
         getDataWrapper(arrival_date, departure_date, adults, kids);
 
     }

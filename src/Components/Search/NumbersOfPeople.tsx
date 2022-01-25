@@ -42,13 +42,17 @@ const NumbersOfPeople: FC<PropsType> = (props) => {
     const [kids, setKids] = useState<any>(kidsProps)
 
     useEffect(() => {
-        addKids(kids)
+        addKids(Object.values(kids))
     }, [kids])
 
     let handleChange = (el: any) =>(event:any)=> {
         setKids((actual:any)=>{
-            let arr = {...kids, [el]:event.target.value}
-            return Object.values(arr);
+            let arr = {
+                ...kids,
+                [el]: event.target.value
+            }
+            let kidsArr = Object.values(arr);
+            return arr;
         })
         event.preventDefault()
     }

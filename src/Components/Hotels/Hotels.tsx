@@ -1,7 +1,7 @@
-import React, {useEffect, useState} from "react";
+import React, { useState} from "react";
 import '../../App.css';
 import Hotel from "./Hotel";
-import {getHotelsSelector, getIsFetching, getIsReady} from "../../Selectors/selectors";
+import {getHotelsSelector} from "../../Selectors/selectors";
 import { useSelector} from "react-redux";
 
 

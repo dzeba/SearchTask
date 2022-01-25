@@ -5,8 +5,8 @@ import Title from "./Components/Title";
 import Footer from "./Components/Footer";
 import Search from "./Components/Search/Search";
 import HotelsPage from "./Components/Hotels/HotelsPage";
-import {BrowserRouter, Router} from "react-router-dom";
-import Preloader from "./common/preloader";
+import {BrowserRouter} from "react-router-dom";
+
 
 function App() {
     return <div className="App">
