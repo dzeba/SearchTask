@@ -26,7 +26,7 @@ export let CountAdults: FC<PropsType> = (props) => {
         addAdults(adults)
     }, [adults])
 
-    if (adults === 0) {
+    if (adults <= 1) {
         return <div className='settings_block'><span className='settings_block-text'>Дорослих</span>
             <button disabled onClick={decrementAdults} className='settings_block-button'>
                 <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">

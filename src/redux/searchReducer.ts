@@ -11,11 +11,17 @@ const COUNT_KIDS = 'COUNT_KIDS'
 const SET_DATA = 'SET_DATA'
 const TOGGLE_IS_FETCHING = 'TOGGLE_IS_FETCHING'
 const TOGGLE_IS_READY = 'TOGGLE_IS_READY'
+const SEND_REQUEST = 'SEND_REQUEST'
+const MESSAGE_ERROR = 'MESSAGE_ERROR'
+
+let date = new Date();
+let day = date.getDate();
+let month = date.getMonth();
 
 // export type DataType = {
-//     day: number | null | undefined
-//     month: number | null | undefined,
 //     year: number | null | undefined
+//     month: number | null | undefined,
+//     day: number | null | undefined
 // }
 export type roomType = {
     id: number
@@ -24,10 +30,6 @@ export type roomType = {
 export type messageType = {
     text: string
     type: string
-}
-export type KidsType = {
-    id: number
-    value: string
 }
 
 export type hotelsType = {
@@ -42,15 +44,22 @@ export type hotelsType = {
 
 }
 let initialState = {
-    arrival_date: null as string | null,
-    departure_date: null as string | null,
-    adults: 0 as number,
+    arrival_date: `2022-${month + 1}-${day}` as string | null,
+    departure_date: `2022-${month + 1}-${day + 1}` as string | null,
+    adults: 2 as number,
     numberOfKids: [] as Array<number>,
     kids: [] as Array<string>,
     rooms: 0 as number,
     hotels: [] as Array<hotelsType>,
     isFetching: false as boolean,
-    isReady: false as boolean
+    isReady: false as boolean,
+    sendRequest: 0 as number,
+    messageError: {
+        adults: [] as Array<string>,
+        departure_date: [] as Array<string>,
+        arrival_date: [] as Array<string>
+    }
+
 }
 export type initialStateType = typeof initialState;
 
@@ -103,6 +112,17 @@ const searchReducer = (state = initialState, action: any): initialStateType => {
                 ...state,
                 isReady: action.isReady
             }
+
+        case SEND_REQUEST:
+            return {
+                ...state,
+                sendRequest: state.sendRequest + 1
+            }
+        case MESSAGE_ERROR:
+            return {
+                ...state,
+                messageError: action.messageError
+            }
         default:
             return state;
     }
@@ -118,7 +138,9 @@ type ActionsTypes =
     | AddRoomsActionCreatorType
     | SetDataType
     | ToggleIsFetchingType
-    |ToggleIsReadyType
+    | ToggleIsReadyType
+    | SendRequestType
+    | MessageErrorType
 
 type CountKidsActionCreatorType = {
     type: typeof COUNT_KIDS,
@@ -203,16 +225,40 @@ export const toggleIsReady = (isReady: boolean): ToggleIsReadyType => {
         isReady
     }
 }
+type MessageErrorType = {
+    type: typeof MESSAGE_ERROR,
+    messageError: string
+}
+export const MessageErrorAC = (messageError: string): MessageErrorType => {
+    return {
+        type: MESSAGE_ERROR,
+        messageError
+    }
+}
+type SendRequestType = {
+    type: typeof SEND_REQUEST,
+}
+export const sendRequestAC = (): SendRequestType => {
+    return {
+        type: SEND_REQUEST,
+    }
+}
 
 type ThunkType = ThunkAction<Promise<void>, AppStateType, unknown, ActionsTypes>
 
-export const getData = (arrival_date: string | null, departure_date: string | null, adults: number, kids: Array<string>): ThunkType => {
-    return async (dispatch) => {
+export const getData = (arrival_date: string | null, departure_date: string | null, adults: number, kids: Array<string>): (dispatch: any) => void => {
+    return (dispatch) => {
         dispatch(toggleIsFetching(true))
-        let response = await searchAPI.postData(arrival_date, departure_date, adults, kids)
-        dispatch(toggleIsFetching(false))
-        dispatch(setData(response.hotels))
-        dispatch(toggleIsReady(false))
+        searchAPI.postData(arrival_date, departure_date, adults, kids).then(response => {
+            dispatch(toggleIsFetching(false))
+            dispatch(setData(response.data.data.hotels))
+            dispatch(sendRequestAC())
+            dispatch(toggleIsReady(false))
+            dispatch(MessageErrorAC(''))
+        }).catch(e => {
+            dispatch(MessageErrorAC(e.response.data.errors))
+            dispatch(toggleIsFetching(false))
+        })
     }
 }
 
@@ -221,7 +267,7 @@ export const getHotels = (): ThunkType => {
         dispatch(toggleIsFetching(true))
         let response = await hotelsAPI.getHotels()
         dispatch(toggleIsFetching(false))
-        dispatch(setData(response.hotels))
+        dispatch(setData(response.data.data.hotels))
         dispatch(toggleIsReady(true))
     }
 }

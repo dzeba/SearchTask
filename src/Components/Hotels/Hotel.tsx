@@ -19,8 +19,8 @@ return <div>
         </div>
         <div className='hotelsBlock_text-description'>
 
-            {hotel.roomTypes.slice(0, 2).map(el => {
-                 return <div> {el.name}</div>
+            {hotel.roomTypes.slice(0, 2).map((el,index) => {
+                 return <div key={index}> {el.name}</div>
             })}
         </div>
         <div className='hotelsBlock_price-block'>

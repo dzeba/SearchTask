@@ -23,7 +23,7 @@ export let Hotels: React.FC<PropsType> = () => {
         <div className='hotelsBlock_text-description'>Вибрані пропозиції</div>
         {}
         <div className='hotels'>
-            {hotels.slice(0, itemsToShow).map((hotel, index) => {if(hotel.roomTypes.length>0) return<Hotel hotel={hotel}/>})}
+            {hotels.slice(0, itemsToShow).map((hotel, index) => {if(hotel.roomTypes.length>0) return<Hotel hotel={hotel} key={index}/>})}
         </div>
         <div className='hotels_showButton-wrapper'>
             {(itemsToShow === 4 )
@@ -43,7 +43,7 @@ export let HotelsReady: React.FC<PropsType> = () => {
         <div className='hotelsBlock_text-description'>Вибрані пропозиції</div>
         {}
         <div className='hotels'>
-            {hotels.map((hotel, index) => {if(hotel.roomTypes.length>0) return<Hotel hotel={hotel}/>})}
+            {hotels.map((hotel, index) => {if(hotel.roomTypes.length>0) return<Hotel hotel={hotel} key={index}/>})}
         </div>
     </div>
 }

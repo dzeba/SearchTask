@@ -1,4 +1,4 @@
-import React, {FC, useCallback, useEffect, useRef, useState} from "react";
+import React, {FC, Suspense, useCallback, useEffect, useLayoutEffect, useRef, useState} from "react";
 import '../../App.css';
 import NumbersOfPeople from "./NumbersOfPeople";
 import ArrivalCalendar from "./ArrivalCalendar";
@@ -6,22 +6,22 @@ import {useDispatch, useSelector} from "react-redux";
 import {
     get_arrival_date,
     get_departure_date,
-    getAdults, getHotelsSelector,
+    getAdults,
     getIsFetching,
-    getKids, getNumberOfKids,
-    getRooms
+    getKids, getMessageError, getNumberOfKids,
+    getRooms, getSendRequest
 } from "../../Selectors/selectors";
 import {
     addAdultsActionCreator,
     addArrivalDateActionCreator,
     addDepartureDateActionCreator,
     addKidsActionCreator,
-    addRoomsActionCreator,
     countKidsActionCreator,
-    getData, getHotels, KidsType,
+    getData, getHotels,
 } from "../../redux/searchReducer";
 import DepartureCalendar from "./DepartureCalender";
-import {createSearchParams, useLocation, useNavigate} from "react-router-dom";
+import { useLocation, useNavigate} from "react-router-dom";
+
 
 
 type PropsType = {}
@@ -32,11 +32,15 @@ const Search: FC<PropsType> = (props) => {
     const adults = useSelector(getAdults)
     const kids = useSelector(getKids)
     const rooms = useSelector(getRooms)
+    const sendRequestNumber = useSelector(getSendRequest)
+    const errorMessage = useSelector(getMessageError)
+
     const numberOfKids = useSelector(getNumberOfKids)
     const dispatch = useDispatch()
     const addArrivalDate = (day: string | null) => {
         dispatch(addArrivalDateActionCreator(day))
     }
+
     const addDepartureDate = (day: string | null) => {
         dispatch(addDepartureDateActionCreator(day))
     }
@@ -52,12 +56,10 @@ const Search: FC<PropsType> = (props) => {
     const countKids = (numberOfKids: Array<number>) => {
         dispatch(countKidsActionCreator(numberOfKids))
     }
-    const getHotelsWrapper = () =>{
+    const getHotelsWrapper = () => {
         dispatch(getHotels())
     }
-    const addRooms = (rooms: number) => {
-        dispatch(addRoomsActionCreator(rooms))
-    }
+
     const [isOpenSettings, setIsOpenSettings] = useState(false)
     const [isOpenDeparture, setIsOpenDeparture] = useState(false)
     const [isOpenArrival, setIsOpenArrival] = useState(false)
@@ -89,27 +91,26 @@ const Search: FC<PropsType> = (props) => {
         countKids(arr)
         addKids(actualKids)
         addAdults(actualAdults)
-        if(actualDeparture_date === null || actualArrival_date === null || actualAdults ===0){
+        if (actualAdults === 2) {
             getHotelsWrapper()
-        }
-        else {
+        } else {
             getDataWrapper(actualArrival_date, actualDeparture_date, actualAdults, actualKids)
         }
     }, [])
 
 
-    useEffect(() => {
-
-        let arr = Object.keys(kids).map((key) => {
-            // @ts-ignore
-            return `&kids[]=${kids[key]}`
-        });
-        let arr1 = arr.join('')
+    useLayoutEffect(() => {
+        let query: any = {}
+        if (departure_date !== null) query.departure_date = departure_date
+        if (arrival_date !== null) query.arrival_date = arrival_date
+        if (adults !== 0) query.adults = adults
+        if (kids.length > 0) query.kids = kids
         navigate({
             pathname: "/SearchTask",
-            search: `?arrival_date=${arrival_date}&departure_date=${departure_date}&adults=${adults}${arr1}`
+            search: queryString.stringify(query, {arrayFormat: 'bracket'})
         });
-    }, [arrival_date, departure_date, adults,numberOfKids, kids])
+    }, [sendRequestNumber])
+
 
     let openSettingsMenu = (event: any) => {
         setIsOpenSettings(true)
@@ -143,8 +144,9 @@ const Search: FC<PropsType> = (props) => {
             document.removeEventListener('mousedown', closeArrivalCalendar);
         }
     }
-    let SendRequest = () => {
+    let SendRequestClick = () => {
         getDataWrapper(arrival_date, departure_date, adults, kids);
+
     }
 
     return <div className='search'>
@@ -174,21 +176,24 @@ const Search: FC<PropsType> = (props) => {
                 {isOpenDeparture &&
                 <DepartureCalendar addDepartureDate={addDepartureDate}/>
                 }
+                <div className='errorMessage'>{errorMessage.departure_date ? <div>{errorMessage.departure_date[0]}</div> : null}</div>
             </div>
             <div className='settingsBlock' ref={wrapperSettingsRef} onClick={openSettingsMenu}>
                 <div className='search_label'>
                     <label>
                         <div className='search_label-text1'>Гості</div>
                         <div
-                            className='search_label-text2'>{rooms !== 0 ? rooms : 'Оберіть кількість гостей'}</div>
+                            className='search_label-text2'>{rooms !== 0 || numberOfKids.length !== 0 ||
+                        adults !== 0 ? `${adults} дорослих , ${numberOfKids.length} дітей , ${rooms} кімнат` : 'Оберіть кількість гостей'}</div>
                     </label>
                 </div>
                 {isOpenSettings &&
                 <div>
                     <NumbersOfPeople/>
                 </div>}
+                <div className='errorMessage'>{errorMessage.adults ? <div>{errorMessage.adults[0]}</div> : null}</div>
             </div>
-            <button className='searchSubmit' onClick={SendRequest}>
+            <button className='searchSubmit' onClick={SendRequestClick}>
                 <div className='searchSubmit_text'>
                     <svg width="21" height="20" viewBox="0 0 21 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path
@@ -202,4 +207,5 @@ const Search: FC<PropsType> = (props) => {
         </div>
     </div>
 }
+
 export default Search

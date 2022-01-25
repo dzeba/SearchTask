@@ -27,3 +27,9 @@ export const getIsFetching = (state: AppStateType) =>{
 export const getIsReady = (state: AppStateType) =>{
     return state.searchPage.isReady
 }
+export const getSendRequest = (state: AppStateType) =>{
+    return state.searchPage.sendRequest
+}
+export const getMessageError = (state: AppStateType) =>{
+    return state.searchPage.messageError
+}
