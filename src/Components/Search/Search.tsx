@@ -106,7 +106,7 @@ const Search: FC<PropsType> = (props) => {
         if (adults !== 0) query.adults = adults
         if (kids.length > 0) query.kids = kids
         navigate({
-            pathname: "/SearchTask",
+            pathname: "/SearchTask/",
             search: queryString.stringify(query, {arrayFormat: 'bracket'})
         });
     }, [sendRequestNumber])
